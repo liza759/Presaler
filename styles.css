@@ -298,11 +298,18 @@ h1 {
 
 .calendar-card__legend {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   color: var(--muted-foreground);
   font-size: 0.75rem;
   font-family: var(--font-mono);
+}
+
+.calendar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .calendar-dot {
@@ -312,26 +319,41 @@ h1 {
   background: var(--primary);
 }
 
+.calendar-dot--soft {
+  background: color-mix(in oklab, var(--secondary) 70%, white);
+}
+
+.calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.calendar-panel {
+  min-width: 0;
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
+  gap: 5px;
 }
 
 .calendar-day,
 .calendar-weekday {
   display: grid;
   place-items: center;
-  min-height: 34px;
+  min-height: 30px;
   border-radius: 10px;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 
 .calendar-weekday {
-  min-height: 22px;
+  min-height: 18px;
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.66rem;
 }
 
 .calendar-day {
@@ -339,6 +361,9 @@ h1 {
   border: 1px solid var(--border);
   background: color-mix(in oklab, var(--card) 94%, transparent);
   font-family: var(--font-mono);
+  cursor: pointer;
+  padding: 0;
+  color: var(--foreground);
 }
 
 .calendar-day.is-muted {
@@ -364,53 +389,88 @@ h1 {
   box-shadow: inset 0 0 0 1px var(--foreground);
 }
 
-.deadline-list {
-  display: grid;
-  gap: 8px;
+.calendar-day.is-selected {
+  border-color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--foreground);
 }
 
-.deadline-item {
+.agenda-panel {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
+}
+
+.agenda-panel__head {
+  display: grid;
+  gap: 4px;
+}
+
+.agenda-panel__title {
+  font-size: 0.96rem;
+}
+
+.agenda-panel__hint {
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.agenda-section {
+  display: grid;
+  gap: 6px;
+}
+
+.agenda-section__label {
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.agenda-list {
+  display: grid;
+  gap: 6px;
+}
+
+.agenda-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
   align-items: center;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-soft);
 }
 
-.deadline-item__date {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  min-height: 42px;
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--primary) 16%, var(--card));
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.deadline-item__body {
+.agenda-item__body {
   min-width: 0;
 }
 
-.deadline-item__title {
-  font-size: 0.86rem;
+.agenda-item__title {
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
-.deadline-item__meta {
-  margin-top: 3px;
+.agenda-item__meta {
+  margin-top: 2px;
   color: var(--muted-foreground);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-family: var(--font-mono);
 }
 
-.deadline-item__status {
+.agenda-item__type {
   justify-self: end;
+}
+
+.agenda-empty {
+  padding: 10px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .layout {
@@ -823,6 +883,10 @@ h1 {
   }
 
   .topbar__widgets {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-layout {
     grid-template-columns: 1fr;
   }
 }

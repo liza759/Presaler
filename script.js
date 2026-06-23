@@ -8,6 +8,11 @@ const presaleRequests = [
     outcome: "Ждём решение",
     deadlineISO: "2026-06-28",
     deadline: "28 июня",
+    calendarEvents: [
+      { dateISO: "2026-06-26", type: "call", label: "Созвон по финальной рамке и бюджету" },
+      { dateISO: "2026-06-27", type: "delivery", label: "Отправка презентации и сметы клиенту" },
+      { dateISO: "2026-06-28", type: "tender", label: "Дедлайн тендерного предложения" }
+    ],
     summary:
       "Клиент прислал бриф и референсы. Идёт сборка презентации, сметы и продакшн-подхода.",
     owner: "Лиза + продюсер",
@@ -37,6 +42,11 @@ const presaleRequests = [
     outcome: "Не начато",
     deadlineISO: "2026-06-30",
     deadline: "30 июня",
+    calendarEvents: [
+      { dateISO: "2026-06-24", type: "call", label: "Уточняющий созвон по SKU и deliverables" },
+      { dateISO: "2026-06-29", type: "delivery", label: "Отправка предварительного scope" },
+      { dateISO: "2026-06-30", type: "tender", label: "Сдача черновика КП" }
+    ],
     summary:
       "Нужно уточнить объём deliverables и получить финальные SKU, чтобы перевести бриф в понятный объём работ.",
     owner: "Продюсер + арт-директор",
@@ -65,6 +75,11 @@ const presaleRequests = [
     outcome: "Победили",
     deadlineISO: "2026-06-18",
     deadline: "Завершено",
+    calendarEvents: [
+      { dateISO: "2026-06-16", type: "delivery", label: "Отправка финальной презентации" },
+      { dateISO: "2026-06-17", type: "call", label: "Защитный созвон с клиентом" },
+      { dateISO: "2026-06-18", type: "tender", label: "Финальное решение по тендеру" }
+    ],
     summary:
       "Команда прошла тендерный этап. Клиент подтвердил запуск в полном объёме после защиты стратегии.",
     owner: "Лиза + режиссёр",
@@ -94,6 +109,11 @@ const presaleRequests = [
     outcome: "Проиграли",
     deadlineISO: "2026-06-15",
     deadline: "Завершено",
+    calendarEvents: [
+      { dateISO: "2026-06-13", type: "delivery", label: "Отправка сметы и treatment" },
+      { dateISO: "2026-06-14", type: "call", label: "Финальный созвон по предложению" },
+      { dateISO: "2026-06-15", type: "tender", label: "Окончание тендерного этапа" }
+    ],
     summary:
       "Коммерческое предложение завершено, но клиент выбрал подрядчика с более низким бюджетом и внутренним продакшн-ресурсом.",
     owner: "Продюсер",
@@ -125,7 +145,10 @@ const elements = {
   themeToggleLabel: document.querySelector(".theme-toggle__label"),
   calendarMonthLabel: document.querySelector("#calendarMonthLabel"),
   calendarGrid: document.querySelector("#calendarGrid"),
-  deadlineList: document.querySelector("#deadlineList"),
+  agendaDateLabel: document.querySelector("#agendaDateLabel"),
+  agendaTenderList: document.querySelector("#agendaTenderList"),
+  agendaDeliveryList: document.querySelector("#agendaDeliveryList"),
+  agendaCallList: document.querySelector("#agendaCallList"),
   detailPanel: document.querySelector("#detailPanel"),
   detailEmpty: document.querySelector("#detailEmpty"),
   activeCount: document.querySelector('[data-stat="activeCount"]'),
@@ -137,6 +160,7 @@ const elements = {
 let selectedId = presaleRequests[0]?.id ?? null;
 const themeStorageKey = "presaler-theme";
 const calendarLocale = "ru-RU";
+let selectedCalendarDateISO = null;
 
 function uniqueValues(list, key) {
   return [...new Set(list.map((item) => item[key]))];
@@ -194,20 +218,87 @@ function formatCalendarMonth(date) {
   return new Intl.DateTimeFormat(calendarLocale, { month: "long", year: "numeric" }).format(date);
 }
 
-function formatDeadlineMeta(item) {
+function formatAgendaMeta(item) {
   return `${item.client} · ${item.status}`;
 }
 
+function getCalendarEvents() {
+  return presaleRequests.flatMap((item) =>
+    (item.calendarEvents || []).map((event) => ({
+      ...event,
+      itemId: item.id,
+      itemTitle: item.title,
+      client: item.client,
+      status: item.status,
+      outcome: item.outcome,
+      date: new Date(`${event.dateISO}T12:00:00`)
+    }))
+  );
+}
+
 function getDeadlineItems() {
-  return presaleRequests
-    .filter((item) => item.deadlineISO)
-    .map((item) => ({ ...item, deadlineDate: new Date(`${item.deadlineISO}T12:00:00`) }))
-    .sort((a, b) => a.deadlineDate - b.deadlineDate);
+  return getCalendarEvents()
+    .filter((event) => event.type === "tender")
+    .sort((a, b) => a.date - b.date);
+}
+
+function getEventsForDate(dateISO) {
+  return getCalendarEvents().filter((event) => event.dateISO === dateISO);
+}
+
+function renderAgendaItems(target, events, emptyText, badgeLabel) {
+  if (!events.length) {
+    target.innerHTML = `<div class="agenda-empty">${emptyText}</div>`;
+    return;
+  }
+
+  target.innerHTML = events
+    .map(
+      (event) => `
+        <article class="agenda-item">
+          <div class="agenda-item__body">
+            <div class="agenda-item__title">${event.itemTitle}</div>
+            <div class="agenda-item__meta">${event.label} · ${formatAgendaMeta(event)}</div>
+          </div>
+          <span class="badge badge--status agenda-item__type">${badgeLabel}</span>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderAgenda(dateISO) {
+  const events = getEventsForDate(dateISO);
+  const selectedDate = new Date(`${dateISO}T12:00:00`);
+  elements.agendaDateLabel.textContent = new Intl.DateTimeFormat(calendarLocale, {
+    day: "numeric",
+    month: "long"
+  }).format(selectedDate);
+
+  renderAgendaItems(
+    elements.agendaTenderList,
+    events.filter((event) => event.type === "tender"),
+    "На эту дату нет финального тендерного дедлайна.",
+    "тендер"
+  );
+  renderAgendaItems(
+    elements.agendaDeliveryList,
+    events.filter((event) => event.type === "delivery"),
+    "На эту дату нет отправок материалов.",
+    "материалы"
+  );
+  renderAgendaItems(
+    elements.agendaCallList,
+    events.filter((event) => event.type === "call"),
+    "На эту дату нет созвонов по тендеру.",
+    "созвон"
+  );
 }
 
 function renderCalendarWidget() {
   const deadlines = getDeadlineItems();
-  const now = deadlines[0]?.deadlineDate || new Date();
+  const calendarEvents = getCalendarEvents().sort((a, b) => a.date - b.date);
+  const now = calendarEvents[0]?.date || new Date();
   const monthDate = new Date(now.getFullYear(), now.getMonth(), 1);
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -216,12 +307,18 @@ function renderCalendarWidget() {
   const offset = (firstDay.getDay() + 6) % 7;
   const totalDays = lastDay.getDate();
   const prevMonthLastDay = new Date(year, month, 0).getDate();
-  const deadlineDaySet = new Set(
-    deadlines
-      .filter((item) => item.deadlineDate.getMonth() === month && item.deadlineDate.getFullYear() === year)
-      .map((item) => item.deadlineDate.getDate())
+  const eventDaySet = new Set(
+    calendarEvents
+      .filter((event) => event.date.getMonth() === month && event.date.getFullYear() === year)
+      .map((event) => event.date.getDate())
   );
   const today = new Date();
+  if (!selectedCalendarDateISO) {
+    selectedCalendarDateISO =
+      deadlines.find((event) => event.date.getMonth() === month && event.date.getFullYear() === year)?.dateISO ||
+      calendarEvents[0]?.dateISO ||
+      `${year}-${String(month + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  }
 
   elements.calendarMonthLabel.textContent = formatCalendarMonth(monthDate);
   elements.calendarGrid.innerHTML = "";
@@ -252,31 +349,24 @@ function renderCalendarWidget() {
       today.getFullYear() === year &&
       today.getMonth() === month &&
       today.getDate() === displayNumber;
-    const hasDeadline = isCurrentMonth && deadlineDaySet.has(displayNumber);
+    const dateISO = `${year}-${String(month + 1).padStart(2, "0")}-${String(displayNumber).padStart(2, "0")}`;
+    const hasEvent = isCurrentMonth && eventDaySet.has(displayNumber);
+    const isSelected = isCurrentMonth && selectedCalendarDateISO === dateISO;
 
     elements.calendarGrid.insertAdjacentHTML(
       "beforeend",
-      `<div class="calendar-day${isMuted ? " is-muted" : ""}${hasDeadline ? " has-deadline" : ""}${isToday ? " is-today" : ""}">${displayNumber}</div>`
+      `<button class="calendar-day${isMuted ? " is-muted" : ""}${hasEvent ? " has-deadline" : ""}${isToday ? " is-today" : ""}${isSelected ? " is-selected" : ""}" type="button"${isCurrentMonth ? ` data-date="${dateISO}"` : " disabled"}>${displayNumber}</button>`
     );
   }
 
-  const upcoming = deadlines.slice(0, 3);
-  elements.deadlineList.innerHTML = upcoming
-    .map((item) => {
-      const day = new Intl.DateTimeFormat(calendarLocale, { day: "2-digit" }).format(item.deadlineDate);
-      const monthShort = new Intl.DateTimeFormat(calendarLocale, { month: "short" }).format(item.deadlineDate);
-      return `
-        <article class="deadline-item">
-          <div class="deadline-item__date">${day}<br>${monthShort}</div>
-          <div class="deadline-item__body">
-            <div class="deadline-item__title">${item.title}</div>
-            <div class="deadline-item__meta">${formatDeadlineMeta(item)}</div>
-          </div>
-          <span class="badge badge--status deadline-item__status">${item.outcome}</span>
-        </article>
-      `;
-    })
-    .join("");
+  elements.calendarGrid.querySelectorAll("[data-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedCalendarDateISO = button.dataset.date;
+      renderCalendarWidget();
+    });
+  });
+
+  renderAgenda(selectedCalendarDateISO);
 }
 
 function formatThemeLabel(theme) {

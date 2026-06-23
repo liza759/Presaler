@@ -94,12 +94,33 @@
                 <h2 id="calendarMonthLabel" class="calendar-card__title">Календарь</h2>
               </div>
               <div class="calendar-card__legend">
-                <span class="calendar-dot"></span>
-                <span>дедлайны</span>
+                <span class="calendar-legend-item"><span class="calendar-dot"></span><span>тендер</span></span>
+                <span class="calendar-legend-item"><span class="calendar-dot calendar-dot--soft"></span><span>материалы / созвоны</span></span>
               </div>
             </div>
-            <div id="calendarGrid" class="calendar-grid" aria-label="Календарь дедлайнов"></div>
-            <div id="deadlineList" class="deadline-list"></div>
+            <div class="calendar-layout">
+              <div class="calendar-panel">
+                <div id="calendarGrid" class="calendar-grid" aria-label="Календарь дедлайнов"></div>
+              </div>
+              <aside class="agenda-panel">
+                <div class="agenda-panel__head">
+                  <h3 id="agendaDateLabel" class="agenda-panel__title">Выбранная дата</h3>
+                  <p class="agenda-panel__hint">Что нужно отдать и какие касания стоят на этот день</p>
+                </div>
+                <div class="agenda-section">
+                  <span class="agenda-section__label">Тендерные дедлайны</span>
+                  <div id="agendaTenderList" class="agenda-list"></div>
+                </div>
+                <div class="agenda-section">
+                  <span class="agenda-section__label">Отправки материалов</span>
+                  <div id="agendaDeliveryList" class="agenda-list"></div>
+                </div>
+                <div class="agenda-section">
+                  <span class="agenda-section__label">Созвоны</span>
+                  <div id="agendaCallList" class="agenda-list"></div>
+                </div>
+              </aside>
+            </div>
           </section>
         </div>
       </header>
