@@ -6,6 +6,7 @@ const presaleRequests = [
     format: "Видео / digital campaign",
     status: "В работе",
     outcome: "Ждём решение",
+    deadlineISO: "2026-06-28",
     deadline: "28 июня",
     summary:
       "Клиент прислал бриф и референсы. Идёт сборка презентации, сметы и продакшн-подхода.",
@@ -34,6 +35,7 @@ const presaleRequests = [
     format: "Product / social",
     status: "Ожидает отработки",
     outcome: "Не начато",
+    deadlineISO: "2026-06-30",
     deadline: "30 июня",
     summary:
       "Нужно уточнить объём deliverables и получить финальные SKU, чтобы перевести бриф в понятный объём работ.",
@@ -61,6 +63,7 @@ const presaleRequests = [
     format: "Employer brand / campaign",
     status: "Завершено",
     outcome: "Победили",
+    deadlineISO: "2026-06-18",
     deadline: "Завершено",
     summary:
       "Команда прошла тендерный этап. Клиент подтвердил запуск в полном объёме после защиты стратегии.",
@@ -89,6 +92,7 @@ const presaleRequests = [
     format: "Explainer / tech",
     status: "Завершено",
     outcome: "Проиграли",
+    deadlineISO: "2026-06-15",
     deadline: "Завершено",
     summary:
       "Коммерческое предложение завершено, но клиент выбрал подрядчика с более низким бюджетом и внутренним продакшн-ресурсом.",
@@ -119,6 +123,9 @@ const elements = {
   outcomeFilter: document.querySelector("#outcomeFilter"),
   themeToggle: document.querySelector("#themeToggle"),
   themeToggleLabel: document.querySelector(".theme-toggle__label"),
+  calendarMonthLabel: document.querySelector("#calendarMonthLabel"),
+  calendarGrid: document.querySelector("#calendarGrid"),
+  deadlineList: document.querySelector("#deadlineList"),
   detailPanel: document.querySelector("#detailPanel"),
   detailEmpty: document.querySelector("#detailEmpty"),
   activeCount: document.querySelector('[data-stat="activeCount"]'),
@@ -129,6 +136,7 @@ const elements = {
 
 let selectedId = presaleRequests[0]?.id ?? null;
 const themeStorageKey = "presaler-theme";
+const calendarLocale = "ru-RU";
 
 function uniqueValues(list, key) {
   return [...new Set(list.map((item) => item[key]))];
@@ -182,6 +190,95 @@ function updateStats(filtered) {
   elements.visibleCount.textContent = `${filtered.length} записей`;
 }
 
+function formatCalendarMonth(date) {
+  return new Intl.DateTimeFormat(calendarLocale, { month: "long", year: "numeric" }).format(date);
+}
+
+function formatDeadlineMeta(item) {
+  return `${item.client} · ${item.status}`;
+}
+
+function getDeadlineItems() {
+  return presaleRequests
+    .filter((item) => item.deadlineISO)
+    .map((item) => ({ ...item, deadlineDate: new Date(`${item.deadlineISO}T12:00:00`) }))
+    .sort((a, b) => a.deadlineDate - b.deadlineDate);
+}
+
+function renderCalendarWidget() {
+  const deadlines = getDeadlineItems();
+  const now = deadlines[0]?.deadlineDate || new Date();
+  const monthDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const offset = (firstDay.getDay() + 6) % 7;
+  const totalDays = lastDay.getDate();
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+  const deadlineDaySet = new Set(
+    deadlines
+      .filter((item) => item.deadlineDate.getMonth() === month && item.deadlineDate.getFullYear() === year)
+      .map((item) => item.deadlineDate.getDate())
+  );
+  const today = new Date();
+
+  elements.calendarMonthLabel.textContent = formatCalendarMonth(monthDate);
+  elements.calendarGrid.innerHTML = "";
+
+  ["пн", "вт", "ср", "чт", "пт", "сб", "вс"].forEach((day) => {
+    elements.calendarGrid.insertAdjacentHTML(
+      "beforeend",
+      `<div class="calendar-weekday">${day}</div>`
+    );
+  });
+
+  for (let index = 0; index < 42; index += 1) {
+    const dayNumber = index - offset + 1;
+    let displayNumber = dayNumber;
+    let isMuted = false;
+
+    if (dayNumber <= 0) {
+      displayNumber = prevMonthLastDay + dayNumber;
+      isMuted = true;
+    } else if (dayNumber > totalDays) {
+      displayNumber = dayNumber - totalDays;
+      isMuted = true;
+    }
+
+    const isCurrentMonth = !isMuted;
+    const isToday =
+      isCurrentMonth &&
+      today.getFullYear() === year &&
+      today.getMonth() === month &&
+      today.getDate() === displayNumber;
+    const hasDeadline = isCurrentMonth && deadlineDaySet.has(displayNumber);
+
+    elements.calendarGrid.insertAdjacentHTML(
+      "beforeend",
+      `<div class="calendar-day${isMuted ? " is-muted" : ""}${hasDeadline ? " has-deadline" : ""}${isToday ? " is-today" : ""}">${displayNumber}</div>`
+    );
+  }
+
+  const upcoming = deadlines.slice(0, 3);
+  elements.deadlineList.innerHTML = upcoming
+    .map((item) => {
+      const day = new Intl.DateTimeFormat(calendarLocale, { day: "2-digit" }).format(item.deadlineDate);
+      const monthShort = new Intl.DateTimeFormat(calendarLocale, { month: "short" }).format(item.deadlineDate);
+      return `
+        <article class="deadline-item">
+          <div class="deadline-item__date">${day}<br>${monthShort}</div>
+          <div class="deadline-item__body">
+            <div class="deadline-item__title">${item.title}</div>
+            <div class="deadline-item__meta">${formatDeadlineMeta(item)}</div>
+          </div>
+          <span class="badge badge--status deadline-item__status">${item.outcome}</span>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function formatThemeLabel(theme) {
   return theme === "dark" ? "Dark" : "Light";
 }
@@ -210,7 +307,10 @@ function createRequestItem(item) {
 
   fragment.querySelector(".request-item__client").textContent = item.client;
   fragment.querySelector(".request-item__title").textContent = item.title;
+  fragment.querySelector(".request-item__format").textContent = item.format;
+  fragment.querySelector(".request-item__owner").textContent = item.owner;
   fragment.querySelector(".request-item__deadline").textContent = `Дедлайн: ${item.deadline}`;
+  fragment.querySelector(".request-item__stage").textContent = item.tenderStage;
   fragment.querySelector(".request-item__summary").textContent = item.summary;
   fragment.querySelector(".badge--status").textContent = item.status;
   fragment.querySelector(".badge--outcome").textContent = item.outcome;
@@ -362,4 +462,5 @@ function bindEvents() {
 populateFilters();
 initTheme();
 bindEvents();
+renderCalendarWidget();
 render();

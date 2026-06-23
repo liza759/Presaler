@@ -18,34 +18,51 @@
   </head>
   <body>
     <div class="page-shell">
-      <header class="hero">
-        <div class="hero__content">
-          <div class="hero__topline">
+      <header class="topbar">
+        <div class="topbar__main panel">
+          <div class="topbar__info">
             <p class="eyebrow">Blaster Presaler</p>
-            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему">
-              <span class="theme-toggle__dot"></span>
-              <span class="theme-toggle__label">Dark</span>
-            </button>
+            <h1>Карта пресейлов и тендерных исходов</h1>
+            <p class="topbar__lead">
+              Компактный борд для статусов, дедлайнов, материалов и результатов коммерческих
+              предложений.
+            </p>
           </div>
-          <h1>Единая карта пресейлов, этапов проработки и итогов коммерческих предложений</h1>
-          <p class="hero__lead">
-            Рабочий онлайн-борд для отслеживания запросов, статусов, дедлайнов, материалов и
-            результатов тендерной работы команды.
-          </p>
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему">
+            <span class="theme-toggle__dot"></span>
+            <span class="theme-toggle__label">Dark</span>
+          </button>
         </div>
-        <div class="hero__meta">
-          <div class="meta-card">
-            <span class="meta-card__label">Активных пресейлов</span>
-            <strong class="meta-card__value" data-stat="activeCount">0</strong>
+        <div class="topbar__widgets">
+          <div class="topbar__meta">
+            <div class="meta-card">
+              <span class="meta-card__label">Активных пресейлов</span>
+              <strong class="meta-card__value" data-stat="activeCount">0</strong>
+            </div>
+            <div class="meta-card">
+              <span class="meta-card__label">На ожидании решения</span>
+              <strong class="meta-card__value" data-stat="waitingCount">0</strong>
+            </div>
+            <div class="meta-card">
+              <span class="meta-card__label">Win rate</span>
+              <strong class="meta-card__value" data-stat="winRate">0%</strong>
+            </div>
           </div>
-          <div class="meta-card">
-            <span class="meta-card__label">На ожидании решения</span>
-            <strong class="meta-card__value" data-stat="waitingCount">0</strong>
-          </div>
-          <div class="meta-card">
-            <span class="meta-card__label">Win rate</span>
-            <strong class="meta-card__value" data-stat="winRate">0%</strong>
-          </div>
+
+          <section class="calendar-card">
+            <div class="calendar-card__head">
+              <div>
+                <p class="section-kicker">Сроки тендеров</p>
+                <h2 id="calendarMonthLabel" class="calendar-card__title">Календарь</h2>
+              </div>
+              <div class="calendar-card__legend">
+                <span class="calendar-dot"></span>
+                <span>дедлайны</span>
+              </div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid" aria-label="Календарь дедлайнов"></div>
+            <div id="deadlineList" class="deadline-list"></div>
+          </section>
         </div>
       </header>
 
@@ -86,15 +103,15 @@
         </section>
 
         <section class="panel board">
-          <div class="section-head">
-            <div>
-              <p class="section-kicker">База запросов</p>
-              <h2>Пресейлы и результаты отработки</h2>
-            </div>
-            <p class="section-note">
-              Демо-структура для будущей онлайн-связки с кодексом, файлами и внешними ресурсами.
-            </p>
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">База запросов</p>
+            <h2>Пресейлы и результаты отработки</h2>
           </div>
+          <p class="section-note">
+            Плотный список для быстрого просмотра нескольких карточек сразу и выбора нужного кейса.
+          </p>
+        </div>
 
           <div class="toolbar">
             <label class="field">
@@ -153,11 +170,18 @@
             <p class="request-item__client"></p>
             <h3 class="request-item__title"></h3>
           </div>
-          <span class="badge badge--status"></span>
+          <div class="request-item__badges">
+            <span class="badge badge--status"></span>
+            <span class="badge badge--outcome"></span>
+          </div>
+        </div>
+        <div class="request-item__subline">
+          <span class="request-item__format"></span>
+          <span class="request-item__owner"></span>
         </div>
         <div class="request-item__meta">
           <span class="request-item__deadline"></span>
-          <span class="badge badge--outcome"></span>
+          <span class="request-item__stage"></span>
         </div>
         <p class="request-item__summary"></p>
       </button>
