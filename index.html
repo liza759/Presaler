@@ -34,20 +34,58 @@
           </button>
         </div>
         <div class="topbar__widgets">
-          <div class="topbar__meta">
-            <div class="meta-card">
-              <span class="meta-card__label">Активных пресейлов</span>
-              <strong class="meta-card__value" data-stat="activeCount">0</strong>
+          <section class="overview-card">
+            <div class="overview-card__head">
+              <div>
+                <p class="section-kicker">Оперативный обзор</p>
+                <h2 class="overview-card__title">Метрики и этапность обработки</h2>
+              </div>
             </div>
-            <div class="meta-card">
-              <span class="meta-card__label">На ожидании решения</span>
-              <strong class="meta-card__value" data-stat="waitingCount">0</strong>
+            <div class="topbar__meta">
+              <div class="meta-card">
+                <span class="meta-card__label">Активных пресейлов</span>
+                <strong class="meta-card__value" data-stat="activeCount">0</strong>
+              </div>
+              <div class="meta-card">
+                <span class="meta-card__label">На ожидании решения</span>
+                <strong class="meta-card__value" data-stat="waitingCount">0</strong>
+              </div>
+              <div class="meta-card">
+                <span class="meta-card__label">Win rate</span>
+                <strong class="meta-card__value" data-stat="winRate">0%</strong>
+              </div>
             </div>
-            <div class="meta-card">
-              <span class="meta-card__label">Win rate</span>
-              <strong class="meta-card__value" data-stat="winRate">0%</strong>
+            <div class="process-strip" aria-label="Этапность обработки пресейла">
+              <article class="process-mini">
+                <span class="process-mini__index">01</span>
+                <div>
+                  <h3>Бриф</h3>
+                  <p>Запрос, вводные, материалы</p>
+                </div>
+              </article>
+              <article class="process-mini">
+                <span class="process-mini__index">02</span>
+                <div>
+                  <h3>Перевод</h3>
+                  <p>Продюсерская рамка и scope</p>
+                </div>
+              </article>
+              <article class="process-mini">
+                <span class="process-mini__index">03</span>
+                <div>
+                  <h3>КП</h3>
+                  <p>Смета, подача, креатив</p>
+                </div>
+              </article>
+              <article class="process-mini">
+                <span class="process-mini__index">04</span>
+                <div>
+                  <h3>Исход</h3>
+                  <p>Ждём, win, loss, причины</p>
+                </div>
+              </article>
             </div>
-          </div>
+          </section>
 
           <section class="calendar-card">
             <div class="calendar-card__head">
@@ -67,41 +105,6 @@
       </header>
 
       <main class="layout">
-        <section class="panel section-stack">
-          <div class="section-head">
-            <div>
-              <p class="section-kicker">Процесс</p>
-              <h2>Карта этапов обработки запроса</h2>
-            </div>
-            <p class="section-note">
-              Схема показывает путь от клиентского брифа до финального исхода тендерного этапа.
-            </p>
-          </div>
-
-          <div class="process-map" aria-label="Карта этапов пресейла">
-            <article class="process-step">
-              <span class="process-step__index">01</span>
-              <h3>Бриф-запрос</h3>
-              <p>Входящий клиентский запрос, контакт, сроки, вводные, приложенные материалы.</p>
-            </article>
-            <article class="process-step">
-              <span class="process-step__index">02</span>
-              <h3>Перевод на язык продакшна</h3>
-              <p>Разбор задачи, уточнения, продюсерская рамка, формат реализации, ресурсы.</p>
-            </article>
-            <article class="process-step">
-              <span class="process-step__index">03</span>
-              <h3>Подготовка предложения</h3>
-              <p>Смета, презентация, продакшн-подход, креатив, дедлайны и ответственные.</p>
-            </article>
-            <article class="process-step">
-              <span class="process-step__index">04</span>
-              <h3>Исход тендера</h3>
-              <p>Ждём решение, прошли дальше, победили или проиграли с фиксацией причины.</p>
-            </article>
-          </div>
-        </section>
-
         <section class="panel board">
         <div class="section-head">
           <div>
