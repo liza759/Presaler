@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presaler Board | Blaster</title>
+    <meta
+      name="description"
+      content="Статический GitHub Pages интерфейс для карты процессов и результатов пресейлов студии Blaster."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__content">
+          <div class="hero__topline">
+            <p class="eyebrow">Blaster Presaler</p>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему">
+              <span class="theme-toggle__dot"></span>
+              <span class="theme-toggle__label">Dark</span>
+            </button>
+          </div>
+          <h1>Единая карта пресейлов, этапов проработки и итогов коммерческих предложений</h1>
+          <p class="hero__lead">
+            Рабочий онлайн-борд для отслеживания запросов, статусов, дедлайнов, материалов и
+            результатов тендерной работы команды.
+          </p>
+        </div>
+        <div class="hero__meta">
+          <div class="meta-card">
+            <span class="meta-card__label">Активных пресейлов</span>
+            <strong class="meta-card__value" data-stat="activeCount">0</strong>
+          </div>
+          <div class="meta-card">
+            <span class="meta-card__label">На ожидании решения</span>
+            <strong class="meta-card__value" data-stat="waitingCount">0</strong>
+          </div>
+          <div class="meta-card">
+            <span class="meta-card__label">Win rate</span>
+            <strong class="meta-card__value" data-stat="winRate">0%</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel section-stack">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Процесс</p>
+              <h2>Карта этапов обработки запроса</h2>
+            </div>
+            <p class="section-note">
+              Схема показывает путь от клиентского брифа до финального исхода тендерного этапа.
+            </p>
+          </div>
+
+          <div class="process-map" aria-label="Карта этапов пресейла">
+            <article class="process-step">
+              <span class="process-step__index">01</span>
+              <h3>Бриф-запрос</h3>
+              <p>Входящий клиентский запрос, контакт, сроки, вводные, приложенные материалы.</p>
+            </article>
+            <article class="process-step">
+              <span class="process-step__index">02</span>
+              <h3>Перевод на язык продакшна</h3>
+              <p>Разбор задачи, уточнения, продюсерская рамка, формат реализации, ресурсы.</p>
+            </article>
+            <article class="process-step">
+              <span class="process-step__index">03</span>
+              <h3>Подготовка предложения</h3>
+              <p>Смета, презентация, продакшн-подход, креатив, дедлайны и ответственные.</p>
+            </article>
+            <article class="process-step">
+              <span class="process-step__index">04</span>
+              <h3>Исход тендера</h3>
+              <p>Ждём решение, прошли дальше, победили или проиграли с фиксацией причины.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel board">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">База запросов</p>
+              <h2>Пресейлы и результаты отработки</h2>
+            </div>
+            <p class="section-note">
+              Демо-структура для будущей онлайн-связки с кодексом, файлами и внешними ресурсами.
+            </p>
+          </div>
+
+          <div class="toolbar">
+            <label class="field">
+              <span class="field__label">Поиск</span>
+              <input
+                id="searchInput"
+                class="field__control"
+                type="search"
+                placeholder="Клиент, проект, формат"
+              />
+            </label>
+
+            <label class="field">
+              <span class="field__label">Статус</span>
+              <select id="statusFilter" class="field__control">
+                <option value="all">Все статусы</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Исход</span>
+              <select id="outcomeFilter" class="field__control">
+                <option value="all">Все исходы</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="board-grid">
+            <div class="table-card">
+              <div class="table-card__head">
+                <h3>Список пресейлов</h3>
+                <span class="table-card__count" data-stat="visibleCount">0</span>
+              </div>
+              <div id="requestList" class="request-list" role="list"></div>
+            </div>
+
+            <aside class="detail-card" aria-live="polite">
+              <div id="detailEmpty" class="detail-empty">
+                <h3>Выбери пресейл</h3>
+                <p>
+                  Здесь появятся этапы, дедлайны, результаты предложения, материалы и комментарии
+                  по выбранному запросу.
+                </p>
+              </div>
+              <div id="detailPanel" class="detail-panel is-hidden"></div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="requestItemTemplate">
+      <button class="request-item" type="button">
+        <div class="request-item__top">
+          <div>
+            <p class="request-item__client"></p>
+            <h3 class="request-item__title"></h3>
+          </div>
+          <span class="badge badge--status"></span>
+        </div>
+        <div class="request-item__meta">
+          <span class="request-item__deadline"></span>
+          <span class="badge badge--outcome"></span>
+        </div>
+        <p class="request-item__summary"></p>
+      </button>
+    </template>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
